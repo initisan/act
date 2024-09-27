@@ -1,7 +1,0 @@
-```mermaid
-%%
-sequenceDiagram
-    autonumber
-
-    
-```
