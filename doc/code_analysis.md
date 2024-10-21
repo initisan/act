@@ -42,7 +42,7 @@ classDiagram
     class runnerImpl{
         config    *Config
         eventJSON string
-        caller    *caller 
+        caller    *caller
 
         NewPlanExecutor(plan *model.Plan) common.Executor
         configure() (Runner, error)
@@ -134,3 +134,12 @@ which I believe invoke the command below
 ```golang
 return executor(common.WithJobErrorContainer(WithJobLogger(ctx, rc.Run.JobID, jobName, rc.Config, &rc.Masks, matrix)))
 ```
+
+## Some questions/finding during my code learning
+
+* the default run `act` will only trigger `job` with `default` event which is `push`
+  ```go
+  //search the code below in root.go to find out why
+  log.Debugf("Using default workflow event: push")
+  ```
+
