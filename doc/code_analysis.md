@@ -143,3 +143,17 @@ return executor(common.WithJobErrorContainer(WithJobLogger(ctx, rc.Run.JobID, jo
   log.Debugf("Using default workflow event: push")
   ```
 
+* How the runing environment being prepared
+  There are some code could be investigated below
+  ```go
+  // in runner.go
+  pipeline = append(pipeline, common.NewParallelExecutor(maxParallel, stageExecutor...))
+
+  // also in runner.go
+    ncpu := runtime.NumCPU()
+    if 1 > ncpu {
+    ncpu = 1
+    }
+    log.Debugf("Detected CPUs: %d", ncpu)
+    return common.NewParallelExecutor(ncpu, pipeline...)(ctx)
+  ```
