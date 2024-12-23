@@ -144,12 +144,22 @@ return executor(common.WithJobErrorContainer(WithJobLogger(ctx, rc.Run.JobID, jo
   ```
 
 * How the runing environment being prepared
-  There are some code could be investigated below
+  There are some code could be investigated below.
+  ```
+  Stage  Job ID   Job name  Workflow name  Workflow file  Events
+  0      test     test      CI             main.yml       push
+  0      release  release   CD             release.yml    push
+  1      build    build     CI             main.yml       push
+  ```
+
   ```go
   // in runner.go
   pipeline = append(pipeline, common.NewParallelExecutor(maxParallel, stageExecutor...))
 
   // also in runner.go
+  // The code below will finnally figure out some pipelines could run in parallele
+  // like the table above, test and release could be run in parallel which is in different
+  // pipeline cuz they are in the different workflow file.
     ncpu := runtime.NumCPU()
     if 1 > ncpu {
     ncpu = 1
@@ -157,3 +167,23 @@ return executor(common.WithJobErrorContainer(WithJobLogger(ctx, rc.Run.JobID, jo
     log.Debugf("Detected CPUs: %d", ncpu)
     return common.NewParallelExecutor(ncpu, pipeline...)(ctx)
   ```
+  The append above are just construct the running environment link, not for real run.
+
+
+* When/Where the running environment link (a link of Executor) actually run
+  Search the code below in `runner.go`
+  ```go
+  return common.NewParallelExecutor(ncpu, pipeline...)(ctx)
+  //which invoke executor.go
+  go func(work <-chan Executor, errs chan<- error)
+  ```
+
+* Some key part
+  ```go
+  //runner.go
+  executor, err := rc.Executor()
+
+  //run_context.go
+  executor = newJobExecutor(rc, &stepFactoryImpl{}, rc)
+  ```
+
