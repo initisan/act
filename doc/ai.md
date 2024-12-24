@@ -129,3 +129,71 @@ graph TD
    - 执行器链按顺序执行每个`Executor`节点，直到链的尾部。
 
 通过这两个图表，可以更清晰地理解GitHub Actions YAML文件中的字段是如何映射到执行器链中的字段，以及执行器链的结构和执行流程。
+
+
+
+
+
+Q: 这个项目中，特别是对于runner有下面的概念 stagePipeline pipeline stageExecutor
+
+这三个概念在项目中的关系可以通过一个图表来解释。以下是它们的关系和执行流程：
+
+1. **stagePipeline**：表示一个阶段的执行器链，每个阶段包含多个并行执行的任务。
+2. **pipeline**：表示整个工作流的执行器链，包含多个阶段，每个阶段可以并行执行。
+3. **stageExecutor**：表示一个阶段的具体执行器。
+
+### 图表说明
+
+```mermaid
+graph TD
+    A[Pipeline] -->|包含多个| B[StagePipeline]
+    B -->|包含多个| C[StageExecutor]
+
+    subgraph Pipeline
+        B1[StagePipeline 1]
+        B2[StagePipeline 2]
+        B3[StagePipeline 3]
+    end
+
+    subgraph StagePipeline
+        C1[StageExecutor 1]
+        C2[StageExecutor 2]
+        C3[StageExecutor 3]
+    end
+
+    A --> B1
+    A --> B2
+    A --> B3
+
+    B1 --> C1
+    B1 --> C2
+    B1 --> C3
+
+    B2 --> C1
+    B2 --> C2
+    B2 --> C3
+
+    B3 --> C1
+    B3 --> C2
+    B3 --> C3
+```
+
+### 解释
+
+1. **Pipeline**：整个工作流的执行器链，由多个`StagePipeline`组成。
+2. **StagePipeline**：表示一个阶段的执行器链，每个阶段包含多个并行执行的任务。
+3. **StageExecutor**：表示一个阶段的具体执行器，负责执行具体的任务。
+
+在代码中，`stagePipeline`是一个包含多个
+
+stageExecutor
+
+的列表，而
+
+pipeline
+
+是一个包含多个`stagePipeline`的列表。每个
+
+stageExecutor
+
+负责执行具体的任务，并且可以并行执行。

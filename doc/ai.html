@@ -265,6 +265,58 @@
 </li>
 </ol>
 <p>通过这两个图表，可以更清晰地理解GitHub Actions YAML文件中的字段是如何映射到执行器链中的字段，以及执行器链的结构和执行流程。</p>
+<p>Q: 这个项目中，特别是对于runner有下面的概念 stagePipeline pipeline stageExecutor</p>
+<p>这三个概念在项目中的关系可以通过一个图表来解释。以下是它们的关系和执行流程：</p>
+<ol>
+<li><strong>stagePipeline</strong>：表示一个阶段的执行器链，每个阶段包含多个并行执行的任务。</li>
+<li><strong>pipeline</strong>：表示整个工作流的执行器链，包含多个阶段，每个阶段可以并行执行。</li>
+<li><strong>stageExecutor</strong>：表示一个阶段的具体执行器。</li>
+</ol>
+<h3 id="图表说明">图表说明</h3>
+<pre style="all:unset;"><div class="mermaid">graph TD
+    A[Pipeline] --&gt;|包含多个| B[StagePipeline]
+    B --&gt;|包含多个| C[StageExecutor]
+
+    subgraph Pipeline
+        B1[StagePipeline 1]
+        B2[StagePipeline 2]
+        B3[StagePipeline 3]
+    end
+
+    subgraph StagePipeline
+        C1[StageExecutor 1]
+        C2[StageExecutor 2]
+        C3[StageExecutor 3]
+    end
+
+    A --&gt; B1
+    A --&gt; B2
+    A --&gt; B3
+
+    B1 --&gt; C1
+    B1 --&gt; C2
+    B1 --&gt; C3
+
+    B2 --&gt; C1
+    B2 --&gt; C2
+    B2 --&gt; C3
+
+    B3 --&gt; C1
+    B3 --&gt; C2
+    B3 --&gt; C3</div></pre>
+<h3 id="解释-1">解释</h3>
+<ol>
+<li><strong>Pipeline</strong>：整个工作流的执行器链，由多个<code>StagePipeline</code>组成。</li>
+<li><strong>StagePipeline</strong>：表示一个阶段的执行器链，每个阶段包含多个并行执行的任务。</li>
+<li><strong>StageExecutor</strong>：表示一个阶段的具体执行器，负责执行具体的任务。</li>
+</ol>
+<p>在代码中，<code>stagePipeline</code>是一个包含多个</p>
+<p>stageExecutor</p>
+<p>的列表，而</p>
+<p>pipeline</p>
+<p>是一个包含多个<code>stagePipeline</code>的列表。每个</p>
+<p>stageExecutor</p>
+<p>负责执行具体的任务，并且可以并行执行。</p>
 
             
             <script async type="text/javascript">
